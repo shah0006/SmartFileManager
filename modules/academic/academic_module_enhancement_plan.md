@@ -78,7 +78,7 @@
     *   Verify duplicate detection accuracy.
     *   Validate the content of the generated duplicate reports.
 
-## IV. Future Considerations (Post-MVP)
+## IV. Future Considerations (Post-MVP)1
 
 *   Allowing user configuration for filename patterns for journal articles.
 *   Using DOI/PMID for more definitive duplicate checking against Zotero.

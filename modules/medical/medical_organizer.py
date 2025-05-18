@@ -6,23 +6,13 @@ content type, and user-defined rules with a focus on privacy and security.
 """
 
 import os
+import getpass
 import re
 import logging
 import datetime
-import shutil
-from typing import Dict, List, Any, Optional, Tuple
-from pathlib import Path
-
+from typing import Dict, Any, Tuple
 from core.file_operations import FileOperations
 from modules.medical.medical_metadata import MedicalMetadataExtractor
-
-# Try to import tqdm for progress bars
-try:
-    from tqdm import tqdm
-    HAS_TQDM = True
-except ImportError:
-    HAS_TQDM = False
-    from core.file_operations import tqdm
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -89,7 +79,7 @@ class MedicalFileOrganizer:
         error_count = 0
         
         # Process files with progress tracking
-        for file_path in tqdm(medical_files, desc="Organizing medical files"):
+        for file_path in medical_files:
             try:
                 # Skip files that don't appear to be medical based on quick check
                 if not self._is_likely_medical_file(file_path):
@@ -179,8 +169,9 @@ class MedicalFileOrganizer:
                     for term in medical_terms:
                         if term in first_lines:
                             return True
-            except:
+            except Exception as e: 
                 # If we can't read the file, assume it might be medical
+                logger.warning(f"Could not read start of file {file_path} to check for medical terms: {e}")
                 pass
         
         # For PDF and other binary files, we assume potentially medical
@@ -250,14 +241,14 @@ class MedicalFileOrganizer:
             return ""
         
         # Replace spaces and special characters
-        text = re.sub(r'[^\w\s\-]', '', text)
+        text = text.replace('[', '').replace(']', '').replace('(', '').replace(')', '')
         text = text.strip()
         
         # Replace spaces with underscores
-        text = re.sub(r'\s+', '_', text)
+        text = text.replace(' ', '_')
         
         # Remove consecutive underscores
-        text = re.sub(r'_+', '_', text)
+        text = text.replace('__', '_')
         
         return text
     
@@ -351,22 +342,22 @@ class MedicalFileOrganizer:
         with open(report_file, 'w', encoding='utf-8') as f:
             f.write("# Medical File Organization Plan Report\n\n")
             f.write(f"Generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
-            f.write(f"## Summary\n")
-            f.write(f"- Source Directory: `{source_dir}`\n")
-            f.write(f"- Target Directory: `{target_dir}`\n")
+            f.write("## Summary\n")
+            f.write(f"- Source Directory: {source_dir}\n")
+            f.write(f"- Target Directory: {target_dir}\n")
             f.write(f"- Total Files Scanned: {total}\n")
             f.write(f"- Medical Files to Organize: {organized}\n")
             f.write(f"- Potential Errors: {errors}\n\n")
             
-            f.write(f"## Organization Settings\n")
+            f.write("## Organization Settings\n")
             f.write(f"- Rename Files: {rename_files}\n")
             f.write(f"- Organize by Document Type: {self.organize_by_doc_type}\n")
             f.write(f"- Organize by Date: {self.organize_by_date}\n")
             f.write(f"- Organize by Facility: {self.organize_by_facility}\n")
             f.write(f"- Anonymize Filenames: {self.anonymize_filenames}\n\n")
             
-            f.write(f"## File Actions Preview\n")
-            f.write(f"The following actions would be taken when running this organization:\n\n")
+            f.write("## File Actions Preview\n")
+            f.write("The following actions would be taken when running this organization:\n\n")
             
             # Re-scan to provide detailed information
             medical_files = self.file_ops.scan_directory(
@@ -380,8 +371,8 @@ class MedicalFileOrganizer:
                 try:
                     # Check if likely medical
                     if not self._is_likely_medical_file(file_path):
-                        f.write(f"- **Source:** `{file_path}`\n")
-                        f.write(f"  - **Action:** Skip (Not identified as medical file)\n\n")
+                        f.write(f"- Source: {file_path}\n")
+                        f.write("  - Action: Skip (Not identified as medical file)\n\n")
                         continue
                     
                     # Extract metadata
@@ -398,22 +389,22 @@ class MedicalFileOrganizer:
                         dest_file = os.path.join(dest_path, os.path.basename(file_path))
                     
                     # Add to report
-                    f.write(f"- **Source:** `{file_path}`\n")
-                    f.write(f"  - **Destination:** `{dest_file}`\n")
-                    f.write(f"  - **Document Type:** {metadata.get('document_type', 'Unknown')}\n")
+                    f.write(f"- Source: {file_path}\n")
+                    f.write(f"  - Destination: {dest_file}\n")
+                    f.write(f"  - Document Type: {metadata.get('document_type', 'Unknown')}\n")
                     if 'date' in metadata:
-                        f.write(f"  - **Date:** {metadata.get('date')}\n")
+                        f.write(f"  - Date: {metadata.get('date')}\n")
                     if 'facility' in metadata:
-                        f.write(f"  - **Facility:** {metadata.get('facility')}\n")
-                    f.write(f"\n")
+                        f.write(f"  - Facility: {metadata.get('facility')}\n")
+                    f.write("\n")
                     
                 except Exception as e:
-                    f.write(f"- **Source:** `{file_path}`\n")
-                    f.write(f"  - **Error:** {str(e)}\n\n")
+                    f.write(f"- Source: {file_path}\n")
+                    f.write(f"  - Error: {str(e)}\n\n")
             
             # If there are more files than shown in the report
             if len(medical_files) > 50:
-                f.write(f"\n*Note: Only showing the first 50 files out of {len(medical_files)} total.*\n")
+                f.write("\n*Note: Only showing the first 50 files out of {} total.*\n".format(len(medical_files)))
         
         logger.info(f"Created medical organization report: {report_file}")
         return report_file
@@ -550,9 +541,10 @@ class PrivacyAwareMedicalOrganizer(MedicalFileOrganizer):
             import base64
             import hashlib
             
-            # In a real application, you'd get the password from a secure source
-            # For demo purposes, we're using a fixed password
-            password = "SmartFileManagerSecurePassword"
+            password = getpass.getpass(prompt="Enter encryption password: ")
+            if not password:
+                logger.error("No password provided. Encryption aborted.")
+                return False
             
             # Generate a key from the password
             key = base64.urlsafe_b64encode(hashlib.sha256(password.encode()).digest())
