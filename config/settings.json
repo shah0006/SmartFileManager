@@ -1,0 +1,77 @@
+{
+    "core": {
+        "to_delete_base_dir": "{project_dir}/to_delete",
+        "log_level": "INFO",
+        "backup_enabled": true,
+        "progress_bars": true,
+        "async_processing": true
+    },
+    "llm": {
+        "provider": "auto",
+        "model": "auto",
+        "max_tokens": 500,
+        "temperature": 0.2,
+        "use_cache": true
+    },
+    "books": {
+        "organize_by_author": true,
+        "organize_by_year": false,
+        "organize_by_publisher": false,
+        "organize_by_language": false,
+        "create_alphabetical_dirs": true,
+        "naming_template": "{author}_{year}_{title}",
+        "extensions": [
+            ".epub",
+            ".mobi",
+            ".azw",
+            ".azw3",
+            ".pdf",
+            ".txt"
+        ]
+    },
+    "academic": {
+        "naming_template": "{authors}_{year}_{title}",
+        "use_llm_extraction": true,
+        "include_abstract": false,
+        "include_doi": true,
+        "zotero_comparison_enabled": true,
+        "pdf_metadata": {
+            "ai_override_single_word_titles": true,
+            "use_organization_as_author": true,
+            "max_authors_in_filename": 2,
+            "hyphenate_isbn": true,
+            "detailed_logging": true
+        }
+    },
+    "medical": {
+        "privacy_level": "high",
+        "anonymize_filenames": true,
+        "organize_by_doc_type": true,
+        "organize_by_date": true,
+        "organize_by_facility": false,
+        "track_operations": true
+    },
+    "general": {
+        "organize_by_type": true,
+        "organize_by_date": false,
+        "organize_by_content": true,
+        "handle_downloads": true,
+        "clean_empty_dirs": true,
+        "group_related_files": true,
+        "exclude_extensions": [
+            ".ini",
+            ".lnk",
+            ".url",
+            ".tmp",
+            ".temp",
+            ".log",
+            ".sys"
+        ],
+        "prevent_circular_moves": true
+    },
+    "ui": {
+        "confirm_operations": true,
+        "detailed_logging": true,
+        "show_preview": true
+    }
+}

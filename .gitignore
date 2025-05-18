@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+.env
+.venv
+env/
+venv/
+ENV/
+VENN/
+
+# IDE specific files
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# Temporary files
+*~
+*.tmp
+*.bak
+
+# Test data (if large or generated)
+# test_data/
+# If you have specific large files in test_data you want to ignore, list them explicitly
+
+# Data files (if large or sensitive)
+# data/
+# If you have specific large or sensitive files in data you want to ignore, list them explicitly
+
+# Configuration files that might contain secrets
+# config/secrets.json
+# config/credentials.ini
+
+# OS-specific files
+.DS_Store
+Thumbs.db
