@@ -34,7 +34,8 @@ class MedicalMetadataExtractor(LLMMetadataExtractor):
         self.document_types = [
             "Lab Result", "Radiology Report", "Clinical Note", 
             "Discharge Summary", "Prescription", "Medical Image",
-            "Medical Literature", "Patient Record", "Medical Invoice"
+            "Medical Literature", "Patient Record", "Medical Invoice",
+            "Medical Journal Article"
         ]
         
         # Common medical document headers

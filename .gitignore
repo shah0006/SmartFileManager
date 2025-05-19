@@ -38,3 +38,6 @@ VENN/
 # OS-specific files
 .DS_Store
 Thumbs.db
+
+# Archives
+SmartFileManager.zip
